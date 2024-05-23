@@ -31,7 +31,7 @@ const getToken = (req, res) => {
           maxAge: 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
           partitioned: true,
         });
-        return res.redirect("http://localhost:3000");
+        return res.redirect(process.env.FRONTEND_HOST);
       }
     });
   }

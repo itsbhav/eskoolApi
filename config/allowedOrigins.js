@@ -1,6 +1,6 @@
 const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3500'
+    prpcess.env.FRONTEND_HOST,
+    process.env.BACKEND_HOST
 ]
 
 module.exports = allowedOrigins;

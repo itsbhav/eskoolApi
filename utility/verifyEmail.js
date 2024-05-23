@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 const mail = async (email, name, role) => {
   try {
     const token = crypto.randomBytes(48).toString("hex");
-    const domain = `http://localhost:3500/verify?token=${token}`;
+    const domain = `${process.env.BACKEND_HOST}/verify?token=${token}`;
     const info = await transporter.sendMail({
       from: process.env.OFFICIAL_MAIL, // sender address
       to: email, // list of receivers
@@ -57,7 +57,7 @@ const verifyMail = async (req, res) => {
       html: `<h1>Your mail has been Verified Successfully.</h1>
           `,
     });
-    return res.redirect("http://localhost:3000");
+    return res.redirect(process,env.FRONTEND_HOST);
   } catch (err) {
     console.log(err?.message);
     return res
@@ -79,7 +79,7 @@ const passMail = async (req, res) => {
     if (data.rowCount === 0)
       return res.status(404).json({ message: "No such account exist" });
     const token = crypto.randomBytes(48).toString("hex");
-    const domain = `http://localhost:3500/secure?token=${token}`;
+    const domain = `${process.env.BACKEND_HOST}/secure?token=${token}`;
     const info = await transporter.sendMail({
       from: process.env.OFFICIAL_MAIL, // sender address
       to: email, // list of receivers
