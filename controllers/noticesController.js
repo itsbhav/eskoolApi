@@ -14,6 +14,7 @@ const getAll = async (req, res) => {
     // console.log(data.rows)
     return res.status(200).json(data.rows);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Some error occured" });
   }
 };
@@ -28,7 +29,7 @@ const deleteNotice = async (req, res) => {
     const data = await db.query("DELETE FROM NOTICE WHERE id=$1 RETURNING *", [
       id,
     ]);
-    console.log(data);
+    // console.log(data);
     try {
       const fileIdRegex = /\/d\/(.+?)\//; // Regular expression to extract the file ID
       const match = data.rows[0].url.match(fileIdRegex);

@@ -4,7 +4,7 @@ const verifyRoles = (...allowedRoles) => {
   return async (req, res, next) => {
     if (!req?.role) return res.status(401).json({ message: "Not Allowed" }); //No Roles available
     const allowedArraySearch = [...allowedRoles];
-    console.log(allowedArraySearch, req.role);
+    // console.log(allowedArraySearch, req.role,"Role Check");
     const result = allowedArraySearch.filter(
       (id) => id.toString() === req.role.toString()
     );

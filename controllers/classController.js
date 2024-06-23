@@ -2,7 +2,7 @@ const db = require("../config/dbConn");
 const getClass = async (req, res) => {
   try {
     const data = await db.query("SELECT * from CLASS");
-    console.log(data);
+    // console.log(data);
     return res.json(data.rows);
   } catch (err) {
     return res.status(500).json({ message: "Some error occured" });

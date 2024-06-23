@@ -7,13 +7,13 @@ const getAll = async (req, res) => {
   const pageNum = parseInt(req.query.pageNum, 10) || 1;
   const startRow = (pageNum - 1) * 10;
   try {
-    const cookies = req.cookies;
     const data = await db.query(
       "SELECT * FROM ADVERTISEMENT ORDER BY timestamp DESC OFFSET $1 LIMIT 10",
       [startRow]
     );
     res.json(data.rows);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Some error occured" });
   }
 };
@@ -29,7 +29,7 @@ const deleteAdvertisement = async (req, res) => {
       "DELETE FROM ADVERTISEMENT WHERE id=$1 RETURNING *",
       [id]
     );
-    console.log(data);
+    // console.log(data);
     try {
       const fileIdRegex = /\/d\/(.+?)\//; // Regular expression to extract the file ID
       const match = data.rows[0].url.match(fileIdRegex);
@@ -48,9 +48,11 @@ const deleteAdvertisement = async (req, res) => {
 // POST
 const postAdvertisement = async (req, res) => {
   const { subject, timestamp } = req?.body;
-
+  // console.log(req)
+  // console.log(subject)
   try {
     const { file } = req;
+    // console.log(file)
     if (file) {
       const url = await uploadSingleFile(
         file.originalname,
@@ -73,7 +75,7 @@ const postAdvertisement = async (req, res) => {
       return res.status(400).json({ message: "Advertisement requires file" });
     }
   } catch (err) {
-    console.log(err)
+    console.log(err);
     return res.status(500).json({ message: "Error posting advertisement" });
   }
 };

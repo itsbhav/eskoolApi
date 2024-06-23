@@ -10,7 +10,8 @@ const oauth2Client = new google.auth.OAuth2(
 const setCreadentials = (req, res) => {
   const authUrl = oauth2Client.generateAuthUrl({
     access_type: "offline",
-    scope: "https://www.googleapis.com/auth/youtube.upload",
+    scope:
+      "https://www.googleapis.com/auth/youtube https://www.googleapis.com/auth/youtube.upload https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtubepartner",
   });
   return res.json({ url: authUrl });
 };
@@ -45,7 +46,7 @@ const uploadVideo = async (req, res) => {
   return res.json({ auth: auth2.access_token });
 };
 
-const addToPlaylist = async (req, res,next) => {
+const addToPlaylist = async (req, res, next) => {
   const { cookies } = req;
   if (!cookies) return res.status(400).json({ message: "Unauthorized" });
   const { auth2 } = cookies;
@@ -53,7 +54,7 @@ const addToPlaylist = async (req, res,next) => {
   const { playlistId, videoId } = req.body;
   if (!playlistId || !videoId)
     return res.status(400).json({ message: "Data Missing" });
-  oauth2Client.setCredentials({ refresh_token: auth2 });
+  oauth2Client.setCredentials({ refresh_token: auth2.refresh_token });
   try {
     const youtube = google.youtube({
       version: "v3",
@@ -72,11 +73,12 @@ const addToPlaylist = async (req, res,next) => {
         },
       },
     };
-
+    // console.log("hiiiiiii")
     const data = await youtube.playlistItems.insert(params);
-    console.log(data);
-    next();
+    // console.log(data);
+    return res.status(200).json({ message: "Added to playlist successfully." });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Some error occured" });
   }
 };

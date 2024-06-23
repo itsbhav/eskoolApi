@@ -57,7 +57,7 @@ const verifyMail = async (req, res) => {
       html: `<h1>Your mail has been Verified Successfully.</h1>
           `,
     });
-    return res.redirect(process,env.FRONTEND_HOST);
+    return res.redirect(process.env.FRONTEND_HOST);
   } catch (err) {
     console.log(err?.message);
     return res
@@ -90,7 +90,7 @@ const passMail = async (req, res) => {
           `,
     });
     const data1 = await db.query(
-      `INSERT INTO email_verify(email,role,token) values($1,$2,$3)`,
+      `INSERT INTO change_pass(email,role,token) values($1,$2,$3)`,
       [email, role, token]
     );
   } catch (err) {
@@ -108,7 +108,7 @@ const verifyPassMail = async (req, res) => {
     return res.status(403).json({ message: "Unauthorized" });
   try {
     const data = await db.query(
-      "DELETE from email_verify where token=$1 RETURNING *",
+      "DELETE from change_pass where token=$1 RETURNING *",
       [token]
     );
     if (data.rowCount === 0)
@@ -126,21 +126,26 @@ const verifyPassMail = async (req, res) => {
 
 const verificationSuccess = async (req, res) => {
   const { password, email, role } = req?.body;
+  // console.log(password,email,role)
   if (!password || !email || !role)
     return res
       .status(403)
       .json({ message: "Unauthorized, all data required." });
   try {
-    if (role !== "STUDENT" && role !== "TEACHER")
+    if (role !== process.env.USER && role !== process.env.TEACHER)
       return res
         .status(403)
         .json({ message: "Unauthorized, all data required." });
     const hashedPwd = await bcrypt.hash(password, 10);
+    let newR = "";
+    if (role === process.env.USER) newR = "STUDENT";
+    else if (role === process.env.TEACHER) newR = "TEACHER";
+    // console.log(role)
     const data = await db.query(
-      `UPDATE ${role} SET password=$1 where email=$2`,
+      `UPDATE ${newR} SET password=$1 where email=$2`,
       [hashedPwd, email]
-      );
-       const info = await transporter.sendMail({
+    );
+    const info = await transporter.sendMail({
       from: process.env.OFFICIAL_MAIL, // sender address
       to: email, // list of receivers
       subject: "Pass Changed Success", // Subject line

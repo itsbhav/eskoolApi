@@ -10,6 +10,4 @@ const pool = new Pool({
   ssl: { require: true },
 });
 
-
-
 module.exports = pool;

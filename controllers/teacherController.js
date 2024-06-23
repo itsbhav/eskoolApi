@@ -1,18 +1,19 @@
 const db = require("../config/dbConn");
 const bcrypt = require("bcrypt");
-const verifier=require("../utility/verifyEmail")
+const verifier = require("../utility/verifyEmail");
+const jwt = require("jsonwebtoken");
 
 // CONFIRMED BY TEACHER
 const confirmedByTeacher = async (req, res) => {
   const { verified_by_admin, email } = req.body;
-  if (typeof(verified_by_admin) !== "boolean" || !email)
+  if (typeof verified_by_admin !== "boolean" || !email)
     return res.status(400).json({ message: "Did not get expected data" });
   try {
     const data = await db.query(
       "UPDATE TEACHER SET verified_by_admin=$1 where email=$2 RETURNING id ",
       [verified_by_admin, email]
     );
-    if (data.rowCount===0)
+    if (data.rowCount === 0)
       return res.status(404).json({ message: "No such user exist" });
     return res.status(201).json({
       message: verified_by_admin
@@ -24,18 +25,20 @@ const confirmedByTeacher = async (req, res) => {
   }
 };
 
-
 // Get Verified and Unverified Teachers
 const getTeachers = async (req, res) => {
   try {
-    const data = await db.query("SELECT id,email,email_verified,institution,name,verified_by_admin,verified_by_teacher from TEACHER");
-    if(data.rowCount===0)return res.ststus(404).json({message:"No teachers exist"})
-    console.log(data);
+    const data = await db.query(
+      "SELECT id,email,email_verified,institution,name,verified_by_admin,verified_by_teacher from TEACHER"
+    );
+    if (data.rowCount === 0)
+      return res.ststus(404).json({ message: "No teachers exist" });
+    // console.log(data);
     return res.json(data.rows);
   } catch (err) {
     return res.status(500).json({ message: "Some error occured" });
   }
-}
+};
 
 // const getTeacherByTId = async (req, res) => {
 //   const { id } = req.query;
@@ -51,14 +54,14 @@ const getTeachers = async (req, res) => {
 // VERIFY A TEACHER
 const verifyTeacher = async (req, res) => {
   const { verified_by_teacher, email } = req.body;
-  if (typeof(verified_by_teacher) !== "boolean" || !email)
+  if (typeof verified_by_teacher !== "boolean" || !email)
     return res.status(400).json({ message: "Did not get expected data" });
   try {
     const data = await db.query(
       "UPDATE TEACHER SET verified_by_teacher=$1 where email=$2 RETURNING id ",
       [verified_by_teacher, email]
     );
-    if (data.rowCount===0)
+    if (data.rowCount === 0)
       return res.status(404).json({ message: "No such user exist" });
     return res.status(201).json({
       message: verified_by_teacher
@@ -72,8 +75,8 @@ const verifyTeacher = async (req, res) => {
 
 // CREATE TEACHER ACCOUNT
 const createTeacher = async (req, res) => {
-  const { email, institution, name, pass } = req.body;
-  if (!email || !name || !pass) {
+  const { email, institution, name, pass, persist } = req.body;
+  if (!email || !name || !pass || typeof persist !== "boolean") {
     return res.status(400).json({ message: "Required fields missing" });
   }
   try {
@@ -122,7 +125,7 @@ const createTeacher = async (req, res) => {
           partitioned: true,
         });
       }
-      await verifier.mail(email,name,"TEACHER");
+      await verifier.mail(email, name, "TEACHER");
       return res.json({ accessToken });
     } catch (err) {
       return res.status(401).json({ message: "Some Conflict Occured" });
@@ -135,14 +138,18 @@ const createTeacher = async (req, res) => {
 const getTeacherById = async (req, res) => {
   const { email } = req;
   try {
-    const data = await db.query("SELECT id,email,email_verified,institution,name,verified_by_admin,verified_by_teacher from TEACHER where email=$1", [email]);
-    if(data.rowCount===0)return res.status(404).json({message:"No such teacher exist"})
-    console.log(data.rows[0]);
-    return res.json(data.rows[0]);
+    const data = await db.query(
+      "SELECT id,email,email_verified,institution,name,verified_by_admin,verified_by_teacher from TEACHER where email=$1",
+      [email]
+    );
+    if (data.rowCount === 0)
+      return res.status(404).json({ message: "No such teacher exist" });
+    // console.log(data.rows[0]);
+    return res.json(data.rows);
   } catch (err) {
     res.status(500).json({ message: "Some error occured" });
   }
-}
+};
 
 module.exports = {
   createTeacher,
