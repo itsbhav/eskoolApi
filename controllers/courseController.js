@@ -123,8 +123,8 @@ const enrollCourseAsMinor = async (req, res) => {
     return res.status(400).json({ message: "Additional Data needed" });
   try {
     const data = await db.query(
-      "SELECT course_class_map.course_id from course_class_map JOIN student on student.class_id=course_class_map.class_id where course_class_map.course_id=$1",
-      [course_id]
+      "SELECT course_class_map.course_id from course_class_map JOIN student on student.class_id=course_class_map.class_id where course_class_map.course_id=$1 and student.roll=$2",
+      [course_id,student_roll]
     );
     if (data.rowCount > 0) {
       return res
