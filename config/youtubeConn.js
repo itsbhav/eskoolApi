@@ -30,7 +30,7 @@ const getToken = (req, res) => {
           secure: true, //https
           sameSite: "None", //cross-site cookie
           maxAge: 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
-          partitioned: true,
+          // partitioned: true,
         });
         return res.redirect(process.env.FRONTEND_HOST);
       }
