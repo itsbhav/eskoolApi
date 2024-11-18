@@ -54,7 +54,7 @@ const addToPlaylist = async (req, res, next) => {
   const { playlistId, videoId } = req.body;
   if (!playlistId || !videoId)
     return res.status(400).json({ message: "Data Missing" });
-  oauth2Client.setCredentials({ refresh_token: auth2.refresh_token });
+  oauth2Client.setCredentials({ access_token:auth2.access_token});
   try {
     const youtube = google.youtube({
       version: "v3",
