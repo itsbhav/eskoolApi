@@ -48,7 +48,7 @@ const verifyMail = async (req, res) => {
     if (data.rows[0].role !== "TEACHER" && data.rows[0].role !== "STUDENT")
       return res.status(404).json({ message: "Some error occured" });
     const data1 = await db.query(
-      `UPDATE ${data.rows[0].role} SET email_verified=true`
+      `UPDATE ${data.rows[0].role} SET email_verified=true where email=$1`,[data.rows[0].email]
     );
     const info = await transporter.sendMail({
       from: process.env.OFFICIAL_MAIL, // sender address
