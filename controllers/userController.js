@@ -44,6 +44,8 @@ const createStudent = async (req, res) => {
       "INSERT INTO STUDENT(class_id,email,inhouse,name,password,roll) VALUES($1,$2,$3,$4,$5,$6)",
       [class_id, email, inhouse, name, passw, roll]
     );
+
+    // LEGACY CODE
     // const accessToken = jwt.sign(
     //   {
     //     UserInfo: {

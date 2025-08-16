@@ -87,6 +87,8 @@ const createTeacher = async (req, res) => {
         "INSERT INTO TEACHER(email,institution,name,password) VALUES($1,$2,$3,$4)",
         [email, ins, name, passw]
       );
+
+      // LEGACY CODE
       // const accessToken = jwt.sign(
       //   {
       //     UserInfo: {
