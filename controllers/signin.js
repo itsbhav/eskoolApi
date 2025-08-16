@@ -21,7 +21,7 @@ const login = async (req, res) => {
     );
     if (!foundUser.rowCount === 0)
       return res.status(404).json({ message: "No User exist" });
-    if (foundUser.rows[0].email_verified === false || foundUser.rows[0].email_verified === null)
+    if (foundUser.rows[0].email_verified === false || !foundUser.rows[0].email_verified)
           return res.status(401).json({ message: "Unauthorized, Please Verify your mail to login" });
     console.log("Email Status "+ foundUser.rows[0].email_verified);
     const match = await bcrypt.compare(password, foundUser.rows[0].password);
