@@ -75,8 +75,8 @@ const verifyTeacher = async (req, res) => {
 
 // CREATE TEACHER ACCOUNT
 const createTeacher = async (req, res) => {
-  const { email, institution, name, pass, persist } = req.body;
-  if (!email || !name || !pass || typeof persist !== "boolean") {
+  const { email, institution, name, pass} = req.body;
+  if (!email || !name || !pass) {
     return res.status(400).json({ message: "Required fields missing" });
   }
   try {
@@ -87,46 +87,46 @@ const createTeacher = async (req, res) => {
         "INSERT INTO TEACHER(email,institution,name,password) VALUES($1,$2,$3,$4)",
         [email, ins, name, passw]
       );
-      const accessToken = jwt.sign(
-        {
-          UserInfo: {
-            useremail: email,
-            userrole: process.env.TEACHER,
-          },
-        },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "15m" }
-      );
-      const refreshToken = jwt.sign(
-        {
-          UserInfo: {
-            useremail: email,
-            userrole: process.env.TEACHER,
-          },
-        },
-        process.env.REFRESH_TOKEN_SECRET,
-        { expiresIn: "7d" }
-      );
-      // Create secure cookie with refresh token
-      if (persist === true) {
-        res.cookie("jwt", refreshToken, {
-          httpOnly: true, //accessible only by web server
-          secure: true, //https
-          sameSite: "None", //cross-site cookie
-          maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
-          partitioned: true,
-        });
-      } else {
-        res.cookie("jwt", refreshToken, {
-          httpOnly: true, //accessible only by web server
-          secure: true, //https
-          sameSite: "None", //cross-site cookie
-          expires: 0, //cookie expiry: set to match rT
-          partitioned: true,
-        });
-      }
+      // const accessToken = jwt.sign(
+      //   {
+      //     UserInfo: {
+      //       useremail: email,
+      //       userrole: process.env.TEACHER,
+      //     },
+      //   },
+      //   process.env.ACCESS_TOKEN_SECRET,
+      //   { expiresIn: "15m" }
+      // );
+      // const refreshToken = jwt.sign(
+      //   {
+      //     UserInfo: {
+      //       useremail: email,
+      //       userrole: process.env.TEACHER,
+      //     },
+      //   },
+      //   process.env.REFRESH_TOKEN_SECRET,
+      //   { expiresIn: "7d" }
+      // );
+      // // Create secure cookie with refresh token
+      // if (persist === true) {
+      //   res.cookie("jwt", refreshToken, {
+      //     httpOnly: true, //accessible only by web server
+      //     secure: true, //https
+      //     sameSite: "None", //cross-site cookie
+      //     maxAge: 7 * 24 * 60 * 60 * 1000, //cookie expiry: set to match rT
+      //     partitioned: true,
+      //   });
+      // } else {
+      //   res.cookie("jwt", refreshToken, {
+      //     httpOnly: true, //accessible only by web server
+      //     secure: true, //https
+      //     sameSite: "None", //cross-site cookie
+      //     expires: 0, //cookie expiry: set to match rT
+      //     partitioned: true,
+      //   });
+      // }
       await verifier.mail(email, name, "TEACHER");
-      return res.json({ accessToken });
+      return res.json({ message:"Teacher "+ name +" with mail "+ email +" added successfully, please verify your email using mail received and login." });
     } catch (err) {
       return res.status(401).json({ message: "Some Conflict Occured" });
     }

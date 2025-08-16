@@ -21,6 +21,8 @@ const login = async (req, res) => {
     );
     if (!foundUser.rowCount === 0)
       return res.status(404).json({ message: "No User exist" });
+    if (foundUser.rows[0].email_verified === false)
+          return res.status(401).json({ message: "Unauthorized, Please Verify your mail to login" });
     // console.log(foundUser.rows[0]);
     const match = await bcrypt.compare(password, foundUser.rows[0].password);
     if (!match) return res.status(401).json({ message: "Unauthorized" });
@@ -90,11 +92,13 @@ const refresh = (req, res) => {
           roleStr = "TEACHER";
         // console.log(decoded.UserInfo.useremail, roleStr);
         const foundUser = await db.query(
-          `SELECT id,email from ${roleStr} where email=$1`,
+          `SELECT id,email,email_verified from ${roleStr} where email=$1`,
           [decoded.UserInfo.useremail]
         );
         if (foundUser.rowCount === 0)
           return res.status(401).json({ message: "Unauthorized" });
+        if (foundUser.rows[0].email_verified === false)
+          return res.status(401).json({ message: "Unauthorized, Please Verify your mail to login" });
         // console.log(foundUser.rows[0]);
         const accessToken = jwt.sign(
           {
